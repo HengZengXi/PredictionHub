@@ -8,6 +8,13 @@ function CreateMarket() {
   const [arbitrator, setArbitrator] = useState('');
   const [date, setDate] = useState('');
 
+  // FIX: Get TOMORROW's date as minimum
+  const getMinDate = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  };
+
   // Convert the HTML date string to a Unix timestamp for Solidity
   const resolutionTimestamp = Math.floor(new Date(date).getTime() / 1000);
 
@@ -34,7 +41,11 @@ function CreateMarket() {
   return (
     <div className="create-market-card">
       <form className="create-market-form-modern" onSubmit={handleSubmit}>
-       
+        <h3 className="form-title">
+          <span className="form-title-icon">✨</span>
+          Create New Market
+        </h3>
+
         {/* Question Field */}
         <div className="form-field">
           <label className="field-label">
@@ -87,7 +98,7 @@ function CreateMarket() {
             />
           </div>
           <div className="field-hint">
-            When this market can be resolved
+             ⚠️ Minimum: Tomorrow's date 
           </div>
         </div>
 

@@ -1,6 +1,9 @@
 import './App.css';
 import MarketCard from './components/MarketCard';
 import CreateMarket from './components/CreateMarket';
+import ReputationDisplay from './components/ReputationDisplay';
+import ReputationLeaderboard from './components/ReputationLeaderboard';
+import HowReputationWorks from './components/HowReputationWorks';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { useContractRead, useContractReads } from 'wagmi';
 import { InjectedConnector } from 'wagmi/connectors/injected';
@@ -26,15 +29,29 @@ function App() {
 
   const marketCount = marketCountData ? Number(marketCountData) : 0;
 
-  // Set up reads
+  // Read markets directly + separate weighted calls
   const marketReads = [];
   for (let i = 0; i < marketCount; i++) {
-    marketReads.push({ address: contractAddress, abi: contractABI, functionName: 'markets', args: [i] });
-    marketReads.push({ address: contractAddress, abi: contractABI, functionName: 'getTotalWeightedYes', args: [i] });
-    marketReads.push({ address: contractAddress, abi: contractABI, functionName: 'getTotalWeightedNo', args: [i] });
+    marketReads.push({
+      address: contractAddress,
+      abi: contractABI,
+      functionName: 'markets',
+      args: [i],
+    });
+    marketReads.push({
+      address: contractAddress,
+      abi: contractABI,
+      functionName: 'getTotalWeightedYes',
+      args: [i],
+    });
+    marketReads.push({
+      address: contractAddress,
+      abi: contractABI,
+      functionName: 'getTotalWeightedNo',
+      args: [i],
+    });
   }
 
-  // Fetch all data
   const { data: marketBatchData, isLoading } = useContractReads({
     contracts: marketReads,
     watch: true,
@@ -42,13 +59,12 @@ function App() {
     staleTime: 2_000,
   });
 
-  // Process data
   const processedMarkets = [];
   if (marketBatchData) {
     for (let i = 0; i < marketCount * 3; i += 3) {
       const marketDataResult = marketBatchData[i]?.result;
-      const weightedYesResult = typeof marketBatchData[i + 1]?.result === 'bigint' ? marketBatchData[i + 1].result : 0n;
-      const weightedNoResult = typeof marketBatchData[i + 2]?.result === 'bigint' ? marketBatchData[i + 2].result : 0n;
+      const weightedYesResult = marketBatchData[i + 1]?.result;
+      const weightedNoResult = marketBatchData[i + 2]?.result;
 
       if (marketDataResult) {
         processedMarkets.push({
@@ -56,19 +72,20 @@ function App() {
           question: marketDataResult[1],
           arbitrator: marketDataResult[2],
           date: new Date(Number(marketDataResult[3]) * 1000).toLocaleDateString(),
-          yesBets: marketDataResult[5],
-          noBets: marketDataResult[6],
-          outcome: marketDataResult[7],
-          weightedYes: weightedYesResult,
-          weightedNo: weightedNoResult,
+          outcome: marketDataResult[4],      // NEW: index 4
+          yesPool: marketDataResult[5],      // NEW: yesPool at index 5
+          noPool: marketDataResult[6],       // NEW: noPool at index 6
+          isResolved: marketDataResult[7],   // NEW: isResolved at index 7
+          weightedYes: typeof weightedYesResult === 'bigint' ? weightedYesResult : 0n,
+          weightedNo: typeof weightedNoResult === 'bigint' ? weightedNoResult : 0n,
         });
       }
     }
   }
 
-  // Filter lists
-  const openMarkets = processedMarkets.filter(m => Number(m.outcome) === 0);
-  const closedMarkets = processedMarkets.filter(m => Number(m.outcome) === 1 || Number(m.outcome) === 2);
+  // Filter by isResolved instead of outcome
+  const openMarkets = processedMarkets.filter(m => !m.isResolved);
+  const closedMarkets = processedMarkets.filter(m => m.isResolved);
 
   // Pagination logic
   const paginateMarkets = (markets, page) => {
@@ -79,7 +96,7 @@ function App() {
 
   const getTotalPages = (markets) => Math.ceil(markets.length / MARKETS_PER_PAGE);
 
-  // Wallet button with modern styling
+  // Wallet button with reputation badge
   const renderWalletButton = () => {
     if (isConnected) {
       return (
@@ -90,6 +107,7 @@ function App() {
               {address?.substring(0, 6)}...{address?.substring(address.length - 4)}
             </span>
           </div>
+          <ReputationDisplay userAddress={address} compact={true} />
           <button className="disconnect-btn" onClick={() => disconnect()}>
             Disconnect
           </button>
@@ -129,17 +147,17 @@ function App() {
               question={market.question}
               arbitrator={market.arbitrator}
               date={market.date}
-              yesBets={market.yesBets}
-              noBets={market.noBets}
+              yesBets={market.yesPool}
+              noBets={market.noPool}
               outcome={market.outcome}
               userAddress={address}
               weightedYes={market.weightedYes}
               weightedNo={market.weightedNo}
+              isResolved={market.isResolved}
             />
           ))}
         </div>
 
-        {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="pagination-controls">
             <button 
@@ -180,15 +198,12 @@ function App() {
     );
   };
 
-  // Main render with modern layout
   return (
     <div className="app-container">
-      {/* Animated background elements */}
       <div className="bg-orb orb-1"></div>
       <div className="bg-orb orb-2"></div>
       <div className="bg-orb orb-3"></div>
 
-      {/* Navbar with Navigation Menu */}
       <nav className="navbar">
         <div className="navbar-content">
           <div className="logo">
@@ -203,15 +218,19 @@ function App() {
             </a>
             <a href="#create" className="nav-link">
               <span className="nav-icon">✨</span>
-              <span>Create Market</span>
+              <span>Create</span>
             </a>
             <a href="#active" className="nav-link">
               <span className="nav-icon">🔥</span>
-              <span>Active Markets</span>
+              <span>Active</span>
             </a>
             <a href="#resolved" className="nav-link">
               <span className="nav-icon">✅</span>
-              <span>Resolved Markets</span>
+              <span>Resolved</span>
+            </a>
+            <a href="#leaderboard" className="nav-link">
+              <span className="nav-icon">🏆</span>
+              <span>Leaderboard</span>
             </a>
           </div>
 
@@ -219,8 +238,7 @@ function App() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="hero">
+      <section id="home" className="hero">
         <div className="hero-content">
           <h1 className="hero-title">
             <span className="gradient-text">Predict the Future.</span>
@@ -229,7 +247,7 @@ function App() {
           </h1>
           <p className="hero-subtitle">
             The most advanced decentralized prediction market on the blockchain.
-            Create markets, place bets, and earn rewards.
+            Create markets, place bets, and earn rewards with NFT bet receipts!
           </p>
           <div className="hero-stats">
             <div className="stat-item">
@@ -248,8 +266,7 @@ function App() {
         </div>
       </section>
 
-      {/* Create Market Section */}
-      <section className="create-market-section">
+      <section id="create" className="create-market-section">
         <div className="section-header">
           <h2 className="section-title">
             <span className="title-icon">✨</span>
@@ -262,8 +279,7 @@ function App() {
         <CreateMarket />
       </section>
 
-      {/* Open Markets Section */}
-      <section className="markets-section">
+      <section id="active" className="markets-section">
         <div className="section-header">
           <h2 className="section-title">
             <span className="title-icon">🔥</span>
@@ -283,8 +299,7 @@ function App() {
         )}
       </section>
 
-      {/* Closed Markets Section */}
-      <section className="markets-section">
+      <section id="resolved" className="markets-section">
         <div className="section-header">
           <h2 className="section-title">
             <span className="title-icon">✅</span>
@@ -304,7 +319,17 @@ function App() {
         )}
       </section>
 
-      {/* Footer */}
+      <section id="leaderboard" className="reputation-section">
+        <ReputationLeaderboard 
+          markets={processedMarkets} 
+          currentUserAddress={address} 
+        />
+      </section>
+
+      <section id="how-it-works" className="reputation-tutorial-section">
+        <HowReputationWorks />
+      </section>
+
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-logo">
@@ -312,7 +337,7 @@ function App() {
             <span className="logo-text">PredictHub</span>
           </div>
           <p className="footer-text">
-            Decentralized prediction markets powered by blockchain technology
+            Decentralized prediction markets powered by blockchain technology with NFT bet receipts
           </p>
           <div className="footer-links">
             <a href="#about" className="footer-link">About</a>

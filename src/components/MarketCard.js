@@ -1,41 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MarketCard.css';
+import VotingPowerCalculator from './VotingPowerCalculator';
 import { useContractWrite, usePrepareContractWrite, useContractRead } from 'wagmi';
 import { contractAddress, contractABI, tokenAddress, tokenABI } from '../constants';
 import { parseUnits, formatUnits } from 'viem';
 
 function MarketCard({
   id, question, date, yesBets, noBets, arbitrator, outcome, userAddress,
-  weightedYes, weightedNo
+  weightedYes, weightedNo, isResolved
 }) {
   const [betAmount, setBetAmount] = useState('');
   const [showBetting, setShowBetting] = useState(false);
 
   const betAmountParsed = betAmount ? parseUnits(betAmount, 6) : 0n;
 
-  // --- Read Token Allowance ---
-  const { data: allowance } = useContractRead({
-    address: tokenAddress, abi: tokenABI, functionName: 'allowance',
-    args: [userAddress, contractAddress], enabled: Boolean(userAddress), watch: true,
+  // Manual reset function
+  const resetBettingForm = () => {
+    setBetAmount('');
+    setShowBetting(false);
+  };
+
+  // --- Read Token Allowance  ---
+  const { data: allowanceData } = useContractRead({
+    address: tokenAddress,
+    abi: tokenABI,
+    functionName: 'allowance',
+    args: [userAddress, contractAddress],
+    enabled: Boolean(userAddress),
+    watch: true,
   });
+
+  // Treat allowance as 0n if undefined
+  const allowance = allowanceData ?? 0n;
 
   // --- "Approve" Token Hook ---
   const { config: configApprove } = usePrepareContractWrite({
-    address: tokenAddress, abi: tokenABI, functionName: 'approve',
-    args: [contractAddress, betAmountParsed], enabled: Boolean(betAmountParsed > 0n),
+    address: tokenAddress,
+    abi: tokenABI,
+    functionName: 'approve',
+    args: [contractAddress, betAmountParsed],
+    enabled: Boolean(betAmountParsed > 0n),
   });
   const { isLoading: isLoadingApprove, isSuccess: isSuccessApprove, write: writeApprove } = useContractWrite(configApprove);
 
   // --- "Bet" Hooks ---
   const { config: configYes } = usePrepareContractWrite({
-    address: contractAddress, abi: contractABI, functionName: 'placeBet',
+    address: contractAddress,
+    abi: contractABI,
+    functionName: 'placeBet',
     args: [id, true, betAmountParsed],
     enabled: Boolean(betAmountParsed > 0n && allowance >= betAmountParsed),
   });
   const { isLoading: isLoadingYes, isSuccess: isSuccessYes, write: writeYes } = useContractWrite(configYes);
 
   const { config: configNo } = usePrepareContractWrite({
-    address: contractAddress, abi: contractABI, functionName: 'placeBet',
+    address: contractAddress,
+    abi: contractABI,
+    functionName: 'placeBet',
     args: [id, false, betAmountParsed],
     enabled: Boolean(betAmountParsed > 0n && allowance >= betAmountParsed),
   });
@@ -43,57 +64,117 @@ function MarketCard({
 
   // --- Resolution Hooks ---
   const { config: configResolveYes } = usePrepareContractWrite({
-    address: contractAddress, abi: contractABI, functionName: 'resolveMarket', args: [id, true],
+    address: contractAddress,
+    abi: contractABI,
+    functionName: 'resolveMarket',
+    args: [id, true],
   });
   const { isLoading: isLoadingResolveYes, isSuccess: isSuccessResolveYes, write: writeResolveYes } = useContractWrite(configResolveYes);
 
   const { config: configResolveNo } = usePrepareContractWrite({
-    address: contractAddress, abi: contractABI, functionName: 'resolveMarket', args: [id, false],
+    address: contractAddress,
+    abi: contractABI,
+    functionName: 'resolveMarket',
+    args: [id, false],
   });
   const { isLoading: isLoadingResolveNo, isSuccess: isSuccessResolveNo, write: writeResolveNo } = useContractWrite(configResolveNo);
 
-  // --- Withdraw Hook ---
+  // --- NFT: Read User's Winning Token Balance ---
+  const yesTokenId = id * 2n; 
+  const noTokenId = (id * 2n) + 1n;
+
+  const isResolvedYes = Number(outcome) === 1;
+  const isResolvedNo = Number(outcome) === 2;
+  const winningTokenId = isResolvedYes ? yesTokenId : (isResolvedNo ? noTokenId : null);
+
+  const { data: winningTokenBalance } = useContractRead({
+    address: contractAddress,
+    abi: contractABI,
+    functionName: 'balanceOf',
+    args: [userAddress, winningTokenId],
+    enabled: isResolved && Boolean(userAddress) && winningTokenId !== null,
+    watch: true,
+  });
+
+  // --- Read YES and NO token balances (for "Your Bet" badge) ---
+  const { data: yesTokenBalance } = useContractRead({
+    address: contractAddress,
+    abi: contractABI,
+    functionName: 'balanceOf',
+    args: [userAddress, yesTokenId],
+    enabled: Boolean(userAddress),
+    watch: true,
+  });
+
+  const { data: noTokenBalance } = useContractRead({
+    address: contractAddress,
+    abi: contractABI,
+    functionName: 'balanceOf',
+    args: [userAddress, noTokenId],
+    enabled: Boolean(userAddress),
+    watch: true,
+  });
+
+  // --- "withdraw" Hook ---
   const { config: configWithdraw } = usePrepareContractWrite({
-    address: contractAddress, abi: contractABI, functionName: 'withdraw', args: [id],
+    address: contractAddress,
+    abi: contractABI,
+    functionName: 'withdraw',
+    args: [id],
+    enabled: winningTokenBalance > 0n,
   });
   const { isLoading: isLoadingWithdraw, isSuccess: isSuccessWithdraw, write: writeWithdraw } = useContractWrite(configWithdraw);
 
-  // --- Read User's Bet ---
-  const { data: userBets } = useContractRead({
-    address: contractAddress, abi: contractABI, functionName: 'getUserBet',
-    args: [id, userAddress], enabled: Boolean(userAddress), watch: true,
-  });
-
-  // --- Calculate Probabilities ---
-  const calculateProbabilities = () => {
-    const totalWeighted = weightedYes + weightedNo;
-    if (totalWeighted === 0n) {
-      return { yesProb: 50, noProb: 50 };
+  // Auto-clear after successful bet - SAFE version
+  useEffect(() => {
+    if (isSuccessYes || isSuccessNo) {
+      const timer = setTimeout(() => {
+        setBetAmount('');
+        setShowBetting(false);
+      }, 2500);
+      return () => clearTimeout(timer);
     }
-    const yesProb = Number((weightedYes * 100n) / totalWeighted);
+  }, [isSuccessYes, isSuccessNo]);
+
+  // --- Calculate Probabilities (using pools, not weighted for now) ---
+  const calculateProbabilities = () => {
+    const totalPool = yesBets + noBets;
+
+    if (totalPool === 0n) {
+      return { yesProb: 0, noProb: 0 };
+    }
+    const yesProb = Number((yesBets * 100n) / totalPool);
     const noProb = 100 - yesProb;
+    
     return { yesProb, noProb };
   };
 
   const { yesProb, noProb } = calculateProbabilities();
   const totalPool = formatUnits(yesBets + noBets, 6);
-  const isResolved = Number(outcome) === 1 || Number(outcome) === 2;
   const isArbitrator = userAddress && arbitrator && (userAddress.toLowerCase() === arbitrator.toLowerCase());
   const hasSufficientAllowance = allowance >= betAmountParsed;
   const showApproveButton = !hasSufficientAllowance && betAmountParsed > 0n;
 
+  // Check if user has NFTs (has bet on this market)
+  const userHasYesNFT = yesTokenBalance > 0n;
+  const userHasNoNFT = noTokenBalance > 0n;
+  const userHasBets = userHasYesNFT || userHasNoNFT;
+
   // Check if user won
-  const yesBetAmount = userBets ? userBets[0] : 0n;
-  const noBetAmount = userBets ? userBets[1] : 0n;
-  const hasWonOnYes = Number(outcome) === 1 && yesBetAmount > 0n;
-  const hasWonOnNo = Number(outcome) === 2 && noBetAmount > 0n;
-  const userWon = hasWonOnYes || hasWonOnNo;
+  const userWon = isResolved && winningTokenBalance > 0n;
 
   return (
     <div className={`market-card-modern ${isResolved ? 'resolved' : ''}`}>
       {/* Market Header */}
       <div className="market-header">
-        <div className="market-question">{question}</div>
+        <div className="market-question">
+          {question}
+          {userHasBets && !isResolved && (
+            <span className="my-bet-badge">
+              🎫 Your NFTs
+            </span>
+          )}
+        </div>
         <div className="market-date">
           <span className="date-icon">📅</span>
           {date}
@@ -103,15 +184,20 @@ function MarketCard({
       {/* VS Section */}
       <div className="vs-section">
         {/* YES Side */}
-        <div className={`outcome-side yes-side ${isResolved && Number(outcome) === 1 ? 'winner' : ''}`}>
+        <div className={`outcome-side yes-side ${isResolvedYes ? 'winner' : ''}`}>
           <div className="outcome-icon">
             <div className="icon-circle yes-circle">
-              {isResolved && Number(outcome) === 1 ? '🏆' : '✅'}
+              {isResolvedYes ? '🏆' : '✅'}
             </div>
           </div>
           <div className="outcome-label">YES</div>
           <div className="outcome-prob">{yesProb}%</div>
           <div className="outcome-pool">{formatUnits(yesBets, 6)} USDC</div>
+          {userHasYesNFT && !isResolved && (
+            <div className="user-nft-indicator">
+              🎫 {formatUnits(yesTokenBalance, 6)}
+            </div>
+          )}
         </div>
 
         {/* Center VS */}
@@ -124,15 +210,20 @@ function MarketCard({
         </div>
 
         {/* NO Side */}
-        <div className={`outcome-side no-side ${isResolved && Number(outcome) === 2 ? 'winner' : ''}`}>
+        <div className={`outcome-side no-side ${isResolvedNo ? 'winner' : ''}`}>
           <div className="outcome-icon">
             <div className="icon-circle no-circle">
-              {isResolved && Number(outcome) === 2 ? '🏆' : '❌'}
+              {isResolvedNo ? '🏆' : '❌'}
             </div>
           </div>
           <div className="outcome-label">NO</div>
           <div className="outcome-prob">{noProb}%</div>
           <div className="outcome-pool">{formatUnits(noBets, 6)} USDC</div>
+          {userHasNoNFT && !isResolved && (
+            <div className="user-nft-indicator">
+              🎫 {formatUnits(noTokenBalance, 6)}
+            </div>
+          )}
         </div>
       </div>
 
@@ -140,15 +231,39 @@ function MarketCard({
       {!isResolved && (
         <div className="action-section">
           {!showBetting ? (
-            <button 
-              className="place-bet-btn" 
-              onClick={() => setShowBetting(true)}
-            >
-              <span className="btn-icon">💰</span>
-              Place Your Bet
-            </button>
+            <>
+              <div className="betting-instructions">
+                <div className="instruction-icon">💡</div>
+                <div className="instruction-text">
+                  <strong>How to Bet:</strong> Enter your USDC amount and approve the transaction. After approval, please wait a few moments for blockchain confirmation before the betting buttons appear. Then choose YES or NO - you'll receive NFT tokens as your bet receipt!
+                </div>
+              </div>
+              <button 
+                className="place-bet-btn" 
+                onClick={() => setShowBetting(true)}
+              >
+                <span className="btn-icon">💰</span>
+                Place Your Bet
+              </button>
+            </>
           ) : (
             <div className="betting-interface">
+              {/* Add Step Progress Indicators */}
+              <div className="betting-steps">
+                <div className={`step ${!showApproveButton ? 'completed' : betAmountParsed > 0n ? 'active' : ''}`}>
+                  <span className="step-number">1</span>
+                  <span className="step-text">Enter Amount</span>
+                </div>
+                <div className={`step ${!showApproveButton ? 'completed' : isLoadingApprove ? 'active' : ''}`}>
+                  <span className="step-number">2</span>
+                  <span className="step-text">Approve USDC</span>
+                </div>
+                <div className={`step ${isLoadingYes || isLoadingNo || isSuccessYes || isSuccessNo ? 'active' : ''}`}>
+                  <span className="step-number">3</span>
+                  <span className="step-text">Place Bet</span>
+                </div>
+              </div>
+
               <div className="bet-input-group">
                 <input
                   type="number"
@@ -160,37 +275,80 @@ function MarketCard({
                   className="bet-input"
                 />
               </div>
+              
+              <VotingPowerCalculator userAddress={userAddress} betAmount={betAmount} />
 
               {showApproveButton ? (
-                <button
-                  disabled={isLoadingApprove || !writeApprove}
-                  onClick={() => writeApprove?.()}
-                  className="approve-btn-modern"
-                >
-                  {isLoadingApprove ? '⏳ Approving...' : `✓ Approve ${betAmount} USDC`}
-                </button>
-              ) : (
-                <div className="bet-buttons-modern">
-                  <button 
-                    disabled={!writeYes || isLoadingYes || betAmountParsed === 0n} 
-                    onClick={() => writeYes?.()} 
-                    className="bet-btn yes-btn"
+                <>
+                  <button
+                    disabled={isLoadingApprove || !writeApprove || betAmountParsed === 0n}
+                    onClick={() => writeApprove?.()}
+                    className="approve-btn-modern"
                   >
-                    {isLoadingYes ? '⏳' : '✅'} Bet YES
+                    {isLoadingApprove ? (
+                      <>⏳ Approving... Check your wallet</>
+                    ) : betAmountParsed === 0n ? (
+                      <>⚠️ Enter amount first</>
+                    ) : (
+                      <>✓ Approve {betAmount} USDC</>
+                    )}
                   </button>
+                  {isLoadingApprove && (
+                    <div className="approval-loading">
+                      <div className="loading-spinner-small"></div>
+                      <span>Processing approval...</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="bet-buttons-modern">
+                    <button 
+                      disabled={!writeYes || isLoadingYes || betAmountParsed === 0n} 
+                      onClick={() => writeYes?.()} 
+                      className="bet-btn yes-btn"
+                    >
+                      {isLoadingYes ? '⏳ Betting...' : '✅ Bet YES'}
+                    </button>
+                    <button 
+                      disabled={!writeNo || isLoadingNo || betAmountParsed === 0n} 
+                      onClick={() => writeNo?.()} 
+                      className="bet-btn no-btn"
+                    >
+                      {isLoadingNo ? '⏳ Betting...' : '❌ Bet NO'}
+                    </button>
+                  </div>
+                  {betAmountParsed > 0n ? (
+                    <div className="betting-hint success-hint">
+                      ✓ USDC Approved! Choose YES or NO to get NFT receipt
+                    </div>
+                  ) : (
+                    <div className="betting-hint success-hint">
+                      ✓ USDC Approved! Choose YES or NO to get NFT 🎫
+                    </div>
+                  )}
+                </>
+              )}
+              
+              {/* Show success message with reset button */}
+              {(isSuccessYes || isSuccessNo) && (
+                <div className="bet-success-box">
+                  <div className="success-text">
+                    ✅ Bet placed successfully! NFT minted 🎫
+                  </div>
                   <button 
-                    disabled={!writeNo || isLoadingNo || betAmountParsed === 0n} 
-                    onClick={() => writeNo?.()} 
-                    className="bet-btn no-btn"
+                    className="reset-bet-btn"
+                    onClick={resetBettingForm}
                   >
-                    {isLoadingNo ? '⏳' : '❌'} Bet NO
+                    Place Another Bet
                   </button>
                 </div>
               )}
               
               <button 
                 className="cancel-bet-btn" 
-                onClick={() => setShowBetting(false)}
+                onClick={resetBettingForm}
+                disabled={isLoadingApprove || isLoadingYes || isLoadingNo}
               >
                 Cancel
               </button>
@@ -222,27 +380,57 @@ function MarketCard({
         </div>
       )}
 
-      {/* Winner Section */}
+      {/* Winner Section - NFT REDEMPTION */}
       {isResolved && userWon && (
         <div className="winner-section">
           <div className="winner-badge">🎉 You Won!</div>
+          <div className="nft-info">
+            <span className="nft-icon">🎫</span>
+            <span>You have {formatUnits(winningTokenBalance || 0n, 6)} winning NFT tokens</span>
+          </div>
           <button 
-            disabled={isLoadingWithdraw} 
+            disabled={isLoadingWithdraw || !writeWithdraw} 
             onClick={() => writeWithdraw?.()} 
             className="withdraw-btn"
           >
-            {isLoadingWithdraw ? '⏳ Withdrawing...' : '💰 Claim Winnings'}
+            {isLoadingWithdraw ? '⏳ Redeeming...' : '💰 Redeem NFTs for Winnings'}
           </button>
+        </div>
+      )}
+
+      {/* Show User's NFT Holdings - CLEARER DESIGN */}
+      {!isResolved && userHasBets && (
+        <div className="nft-holdings-display">
+          <div className="nft-holdings-title">
+            <span className="nft-title-icon">🎫</span>
+            <span>Your NFT Position</span>
+          </div>
+          <div className="nft-holdings-cards">
+            {userHasYesNFT && (
+              <div className="nft-position-card yes-position">
+                <div className="nft-position-icon">✅</div>
+                <div className="nft-position-amount">{formatUnits(yesTokenBalance, 6)} USDC</div>
+                <div className="nft-position-label">NFT for YES</div>
+              </div>
+            )}
+            {userHasNoNFT && (
+              <div className="nft-position-card no-position">
+                <div className="nft-position-icon">❌</div>
+                <div className="nft-position-amount">{formatUnits(noTokenBalance, 6)} USDC</div>
+                <div className="nft-position-label">NFT for NO</div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {/* Success Messages */}
       {isSuccessApprove && <div className="toast-success">✓ Approval successful!</div>}
-      {isSuccessYes && <div className="toast-success">✓ Bet on YES placed!</div>}
-      {isSuccessNo && <div className="toast-success">✓ Bet on NO placed!</div>}
+      {isSuccessYes && <div className="toast-success">✓ Bet placed! NFT minted 🎫</div>}
+      {isSuccessNo && <div className="toast-success">✓ Bet placed! NFT minted 🎫</div>}
       {isSuccessResolveYes && <div className="toast-success">✓ Market resolved to YES!</div>}
       {isSuccessResolveNo && <div className="toast-success">✓ Market resolved to NO!</div>}
-      {isSuccessWithdraw && <div className="toast-success">✓ Winnings claimed!</div>}
+      {isSuccessWithdraw && <div className="toast-success">✓ NFTs redeemed! Winnings claimed!</div>}
     </div>
   );
 }

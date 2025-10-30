@@ -545,3 +545,537 @@
     font-size: 1.5rem;
   }
 }
+
+/* Betting Instructions */
+.betting-instructions {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.instruction-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.instruction-text {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.instruction-text strong {
+  color: #a5b4fc;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* Betting Steps Progress Indicators */
+.betting-steps {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.betting-steps::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: 15%;
+  right: 15%;
+  height: 2px;
+  background: rgba(99, 102, 241, 0.2);
+  z-index: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(30, 41, 59, 0.8);
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #64748b;
+  transition: all 0.3s ease;
+}
+
+.step-text {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 600;
+  text-align: center;
+}
+
+.step.active .step-number {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-color: #6366f1;
+  color: white;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+  animation: pulse-step 1.5s ease-in-out infinite;
+}
+
+.step.active .step-text {
+  color: #a5b4fc;
+}
+
+.step.completed .step-number {
+  background: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.step.completed .step-number::after {
+  content: '';
+
+}
+
+.step.completed .step-text {
+  color: #6ee7b7;
+}
+
+@keyframes pulse-step {
+  0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
+  50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.8); }
+}
+
+/* Betting Hint */
+.betting-hint {
+  text-align: center;
+  padding: 0.75rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  color: #6ee7b7;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Improved Button States */
+.approve-btn-modern:disabled,
+.bet-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.bet-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.cancel-bet-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.success-hint {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  color: #6ee7b7 !important;
+}
+
+.warning-hint {
+  background: rgba(245, 158, 11, 0.1) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  color: #fbbf24 !important;
+}
+
+/* Approve Button Disabled State */
+.approve-btn-modern:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Approval Loading State */
+.approval-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 10px;
+  margin-top: 0.75rem;
+  color: #a5b4fc;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.loading-spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Approve Button When Disabled After Success */
+.approve-btn-modern:disabled {
+  opacity: 0.7 !important;
+  cursor: wait !important;
+}
+
+/* My Bet Badge */
+.my-bet-badge {
+  display: inline-block;
+  margin-left: 0.75rem;
+  padding: 0.3rem 0.75rem;
+  background: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* NFT Badge on Outcome Sides */
+.nft-badge {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(236, 72, 153, 0.2);
+  border: 1px solid rgba(236, 72, 153, 0.4);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #f9a8d4;
+}
+
+/* NFT Holdings Section */
+.nft-holdings-section {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+  border-top: 2px solid rgba(236, 72, 153, 0.3);
+}
+
+.holdings-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f9a8d4;
+  margin-bottom: 1rem;
+}
+
+.holdings-icon {
+  font-size: 1.3rem;
+}
+
+.holdings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.nft-holding-card {
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.nft-holding-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.3);
+}
+
+.yes-nft {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.no-nft {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.nft-amount {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #f1f5f9;
+  margin-bottom: 0.25rem;
+  font-family: 'Courier New', monospace;
+}
+
+.nft-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+/* NFT Info in Winner Section */
+.nft-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  color: #6ee7b7;
+  font-weight: 600;
+}
+
+.nft-icon {
+  font-size: 1.5rem;
+}
+
+/* Cleaner NFT Indicator (replaces ugly nft-badge) */
+.user-nft-indicator {
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.25) 0%, rgba(245, 158, 11, 0.25) 100%);
+  border: 1px solid rgba(236, 72, 153, 0.5);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fbbf24;
+  text-align: center;
+  animation: nft-glow 2s ease-in-out infinite;
+}
+
+@keyframes nft-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(236, 72, 153, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.5); }
+}
+
+/* Success Box with Reset Button */
+.bet-success-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 2px solid rgba(16, 185, 129, 0.4);
+  border-radius: 12px;
+  margin-top: 1rem;
+}
+
+.success-text {
+  text-align: center;
+  color: #6ee7b7;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.reset-bet-btn {
+  padding: 0.8rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reset-bet-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+/* Better Spacing - Add margins between sections */
+.admin-section {
+  margin-top: 1.5rem;
+}
+
+.nft-holdings-display {
+  margin-top: 1.5rem;
+}
+
+.winner-section {
+  margin-top: 0;
+}
+
+/* Redesigned NFT Holdings Display */
+.nft-holdings-display {
+  padding: 1.5rem;
+  background: rgba(15, 20, 35, 0.6);
+  border-top: 2px solid rgba(236, 72, 153, 0.3);
+  margin-top: 0;
+}
+
+.nft-holdings-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f9a8d4;
+  margin-bottom: 1.25rem;
+  justify-content: center;
+}
+
+.nft-title-icon {
+  font-size: 1.4rem;
+}
+
+.nft-holdings-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.nft-position-card {
+  padding: 1.25rem;
+  border-radius: 14px;
+  text-align: center;
+  border: 2px solid;
+  transition: all 0.3s ease;
+  background: rgba(30, 41, 59, 0.4);
+}
+
+.nft-position-card:hover {
+  transform: translateY(-3px);
+}
+
+.yes-position {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.1) 100%);
+}
+
+.yes-position:hover {
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+.no-position {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.1) 100%);
+}
+
+.no-position:hover {
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+}
+
+.nft-position-amount {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #f1f5f9;
+  margin-bottom: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.nft-position-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Success Box Styling */
+.bet-success-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.15) 100%);
+  border: 2px solid rgba(16, 185, 129, 0.5);
+  border-radius: 12px;
+  margin-top: 1rem;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.success-text {
+  text-align: center;
+  color: #6ee7b7;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.reset-bet-btn {
+  padding: 0.9rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reset-bet-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+/* Better NFT Position Card with Icons */
+.nft-position-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.nft-position-amount {
+  font-size: 1.8rem !important;
+  font-weight: 900 !important;
+  color: #f1f5f9 !important;
+  margin-bottom: 0.4rem !important;
+}
+
+.nft-position-label {
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #cbd5e1 !important;
+}
+
+/* Add spacing between major sections */
+.action-section {
+  border-top: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.admin-section {
+  margin-top: 0;
+  border-top: 2px solid rgba(245, 158, 11, 0.3);
+}
+
+.nft-holdings-display {
+  border-top: 2px solid rgba(236, 72, 153, 0.3);
+}
