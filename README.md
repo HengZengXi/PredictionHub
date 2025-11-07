@@ -89,6 +89,7 @@ npm install --legacy-peer-deps
 
 # 3. Start the application
 npm start
+
 The app will be running on http://localhost:3000.
 
 2. How to Test the Full dApp Flow
