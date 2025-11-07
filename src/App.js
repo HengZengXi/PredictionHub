@@ -20,6 +20,25 @@ function App() {
   const [closedMarketsPage, setClosedMarketsPage] = useState(1);
   const MARKETS_PER_PAGE = 6;
 
+  // ----- UPDATED: JavaScript Scroll Function -----
+  const scrollToSection = (event, sectionId) => {
+    // Prevent the default "jump" behavior of the href
+    event.preventDefault(); 
+
+    const section = document.getElementById(sectionId);
+    if (section) {
+      // Calculate offset for sticky 70px navbar
+      const yOffset = -70; 
+      const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      
+      // Smoothly scroll to that position
+      window.scrollTo({top: y, behavior: 'smooth'});
+      
+      // Also update the URL hash without trapping the scroll
+      window.history.pushState(null, null, `#${sectionId}`);
+    }
+  };
+
   const { data: marketCountData } = useContractRead({
     address: contractAddress,
     abi: contractABI,
@@ -206,29 +225,32 @@ function App() {
 
       <nav className="navbar">
         <div className="navbar-content">
-          <div className="logo">
+          
+          {/* ----- UPDATED LINKS ----- */}
+          <a onClick={(e) => scrollToSection(e, 'home')} className="logo" href="#home">
             <span className="logo-icon">🎯</span>
             <span className="logo-text">PredictHub</span>
-          </div>
+          </a>
 
           <div className="nav-menu">
-            <a href="#home" className="nav-link">
+            {/* ----- UPDATED LINKS ----- */}
+            <a onClick={(e) => scrollToSection(e, 'home')} className="nav-link" href="#home">
               <span className="nav-icon">🏠</span>
               <span>Home</span>
             </a>
-            <a href="#create" className="nav-link">
+            <a onClick={(e) => scrollToSection(e, 'create')} className="nav-link" href="#create">
               <span className="nav-icon">✨</span>
               <span>Create</span>
             </a>
-            <a href="#active" className="nav-link">
+            <a onClick={(e) => scrollToSection(e, 'active')} className="nav-link" href="#active">
               <span className="nav-icon">🔥</span>
               <span>Active</span>
             </a>
-            <a href="#resolved" className="nav-link">
+            <a onClick={(e) => scrollToSection(e, 'resolved')} className="nav-link" href="#resolved">
               <span className="nav-icon">✅</span>
               <span>Resolved</span>
             </a>
-            <a href="#leaderboard" className="nav-link">
+            <a onClick={(e) => scrollToSection(e, 'leaderboard')} className="nav-link" href="#leaderboard">
               <span className="nav-icon">🏆</span>
               <span>Leaderboard</span>
             </a>
