@@ -1,4 +1,5 @@
 🎯 PredictHub
+
 PredictHub is a decentralized prediction market dApp where your reputation and skill matter more than the size of your wallet.
 
 This application re-imagines prediction markets by introducing two key features: Reputation-Weighted Voting and NFT Bet Receipts. Market odds are determined by Voting Power (Bet Amount x Reputation Score), giving expert predictors more influence.
