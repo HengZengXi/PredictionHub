@@ -269,7 +269,7 @@ function App() {
           </h1>
           <p className="hero-subtitle">
             The most advanced decentralized prediction market on the blockchain.
-            Create markets, place bets, and earn rewards with NFT bet receipts!
+            Create markets, place bets, and claim winnings with NFT bet receipts!
           </p>
           <div className="hero-stats">
             <div className="stat-item">
