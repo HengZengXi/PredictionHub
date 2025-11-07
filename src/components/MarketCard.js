@@ -169,11 +169,6 @@ function MarketCard({
       <div className="market-header">
         <div className="market-question">
           {question}
-          {userHasBets && !isResolved && (
-            <span className="my-bet-badge">
-              🎫 Your NFTs
-            </span>
-          )}
         </div>
         <div className="market-date">
           <span className="date-icon">📅</span>
@@ -193,11 +188,6 @@ function MarketCard({
           <div className="outcome-label">YES</div>
           <div className="outcome-prob">{yesProb}%</div>
           <div className="outcome-pool">{formatUnits(yesBets, 6)} USDC</div>
-          {userHasYesNFT && !isResolved && (
-            <div className="user-nft-indicator">
-              🎫 {formatUnits(yesTokenBalance, 6)}
-            </div>
-          )}
         </div>
 
         {/* Center VS */}
@@ -219,11 +209,6 @@ function MarketCard({
           <div className="outcome-label">NO</div>
           <div className="outcome-prob">{noProb}%</div>
           <div className="outcome-pool">{formatUnits(noBets, 6)} USDC</div>
-          {userHasNoNFT && !isResolved && (
-            <div className="user-nft-indicator">
-              🎫 {formatUnits(noTokenBalance, 6)}
-            </div>
-          )}
         </div>
       </div>
 
@@ -318,15 +303,12 @@ function MarketCard({
                       {isLoadingNo ? '⏳ Betting...' : '❌ Bet NO'}
                     </button>
                   </div>
-                  {betAmountParsed > 0n ? (
-                    <div className="betting-hint success-hint">
-                      ✓ USDC Approved! Choose YES or NO to get NFT receipt
-                    </div>
-                  ) : (
-                    <div className="betting-hint success-hint">
-                      ✓ USDC Approved! Choose YES or NO to get NFT 🎫
-                    </div>
-                  )}
+                  
+                  {/* ----- THIS BLOCK WAS CHANGED ----- */}
+                  <div className="betting-hint success-hint">
+                    ✓ Approval successful. Place your bet.
+                  </div>
+
                 </>
               )}
               
@@ -383,11 +365,9 @@ function MarketCard({
       {/* Winner Section - NFT REDEMPTION */}
       {isResolved && userWon && (
         <div className="winner-section">
-          <div className="winner-badge">🎉 You Won!</div>
-          <div className="nft-info">
-            <span className="nft-icon">🎫</span>
-            <span>You have {formatUnits(winningTokenBalance || 0n, 6)} winning NFT tokens</span>
-          </div>
+          
+          <div className="winner-badge">🎉 You Won {formatUnits(winningTokenBalance || 0n, 6)} USDC!</div>
+          
           <button 
             disabled={isLoadingWithdraw || !writeWithdraw} 
             onClick={() => writeWithdraw?.()} 
