@@ -57,7 +57,7 @@ function CreateMarket() {
             className="form-input-modern"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Will Bitcoin reach $100k by end of 2025?"
+            placeholder="Will Bitcoin reach $150k by end of 2025?"
             required
           />
         </div>
