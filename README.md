@@ -128,8 +128,6 @@ Enter an amount (e.g., 10 USDC) and click "Approve". Confirm in MetaMask.
 
 After approval, click "Bet YES" and confirm again.
 
-At the bottom of the card, you will see your "Your NFT Position" appear.
-
 Resolve the Market:
 
 On the same market card, you should see the "⚙️ Arbitrator Controls" (because you are the arbitrator).
@@ -142,6 +140,6 @@ Go to the "✅ Resolved Markets" section.
 
 Find your market. You will now see the "🎉 You Won!" message.
 
-Click "💰 Redeem NFTs for Winnings" and confirm the transaction.
+Click "💰 Redeem  Winnings" and confirm the transaction.
 
 Your winnings will be sent to your wallet, and the "You Won" section will disappear.
