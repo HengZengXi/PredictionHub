@@ -1,4 +1,4 @@
-export const contractAddress = "0xDbbE8e5Da63130998f339d34920bda5b8CD81cB7";
+export const contractAddress = "0xE34572858cf848b9F0AdDDd98D6cEFe5d3f7259B";
 
 export const tokenAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
 
