@@ -82,15 +82,12 @@ You can run this dApp locally to test all the features.
 Bash
 
 # 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/PredictHub.git
+git clone https://github.com/HengZengXi/PredictionHub.git
 
-# 2. Navigate into the project directory
-cd PredictHub
+# 2. Install dependencies
+npm install --legacy-peer-deps
 
-# 3. Install dependencies
-npm install
-
-# 4. Start the application
+# 3. Start the application
 npm start
 The app will be running on http://localhost:3000.
 
