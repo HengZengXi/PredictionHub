@@ -373,7 +373,7 @@ function MarketCard({
             onClick={() => writeWithdraw?.()} 
             className="withdraw-btn"
           >
-            {isLoadingWithdraw ? '⏳ Redeeming...' : '💰 Redeem NFTs for Winnings'}
+            {isLoadingWithdraw ? '⏳ Redeeming...' : '💰 Redeem Winnings'}
           </button>
         </div>
       )}
