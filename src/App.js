@@ -362,10 +362,8 @@ function App() {
             Decentralized prediction markets powered by blockchain technology with NFT bet receipts
           </p>
           <div className="footer-links">
-            <a href="#about" className="footer-link">About</a>
-            <a href="#how-it-works" className="footer-link">How It Works</a>
-            <a href="#faq" className="footer-link">FAQ</a>
-            <a href="#contact" className="footer-link">Contact</a>
+            <a onClick={(e) => scrollToSection(e, 'home')} href="#home" className="footer-link">Home</a>
+            <a onClick={(e) => scrollToSection(e, 'how-it-works')} href="#how-it-works" className="footer-link">How It Works</a>
           </div>
         </div>
       </footer>
