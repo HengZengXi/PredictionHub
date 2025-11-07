@@ -82,7 +82,7 @@ You can run this dApp locally to test all the features.
 Bash
 
 # 1. Clone the repository
-git clone https://github.com/HengZengXi/PredictionHub.git
+git clone [https://github.com/HengZengXi/PredictionHub.git](https://github.com/HengZengXi/PredictionHub.git)
 
 # 2. Install dependencies
 npm install --legacy-peer-deps
