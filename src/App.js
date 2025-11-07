@@ -15,12 +15,12 @@ function App() {
   const { connect } = useConnect({ connector: new InjectedConnector() });
   const { disconnect } = useDisconnect();
 
-  // Pagination state
+  
   const [openMarketsPage, setOpenMarketsPage] = useState(1);
   const [closedMarketsPage, setClosedMarketsPage] = useState(1);
   const MARKETS_PER_PAGE = 6;
 
-  // ----- UPDATED: JavaScript Scroll Function -----
+ 
   const scrollToSection = (event, sectionId) => {
     // Prevent the default "jump" behavior of the href
     event.preventDefault(); 
@@ -34,7 +34,7 @@ function App() {
       // Smoothly scroll to that position
       window.scrollTo({top: y, behavior: 'smooth'});
       
-      // Also update the URL hash without trapping the scroll
+      // update the URL hash without trapping the scroll
       window.history.pushState(null, null, `#${sectionId}`);
     }
   };
@@ -91,10 +91,10 @@ function App() {
           question: marketDataResult[1],
           arbitrator: marketDataResult[2],
           date: new Date(Number(marketDataResult[3]) * 1000).toLocaleDateString(),
-          outcome: marketDataResult[4],      // NEW: index 4
-          yesPool: marketDataResult[5],      // NEW: yesPool at index 5
-          noPool: marketDataResult[6],       // NEW: noPool at index 6
-          isResolved: marketDataResult[7],   // NEW: isResolved at index 7
+          outcome: marketDataResult[4],      // index 4
+          yesPool: marketDataResult[5],      // yesPool at index 5
+          noPool: marketDataResult[6],       // noPool at index 6
+          isResolved: marketDataResult[7],   // isResolved at index 7
           weightedYes: typeof weightedYesResult === 'bigint' ? weightedYesResult : 0n,
           weightedNo: typeof weightedNoResult === 'bigint' ? weightedNoResult : 0n,
         });
@@ -226,14 +226,14 @@ function App() {
       <nav className="navbar">
         <div className="navbar-content">
           
-          {/* ----- UPDATED LINKS ----- */}
+          {}
           <a onClick={(e) => scrollToSection(e, 'home')} className="logo" href="#home">
             <span className="logo-icon">🎯</span>
             <span className="logo-text">PredictHub</span>
           </a>
 
           <div className="nav-menu">
-            {/* ----- UPDATED LINKS ----- */}
+            {}
             <a onClick={(e) => scrollToSection(e, 'home')} className="nav-link" href="#home">
               <span className="nav-icon">🏠</span>
               <span>Home</span>

@@ -546,7 +546,7 @@
   }
 }
 
-/* Betting Instructions */
+
 .betting-instructions {
   display: flex;
   align-items: flex-start;
@@ -575,7 +575,7 @@
   margin-bottom: 0.25rem;
 }
 
-/* Betting Steps Progress Indicators */
+
 .betting-steps {
   display: flex;
   justify-content: space-between;
@@ -658,7 +658,7 @@
   50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.8); }
 }
 
-/* Betting Hint */
+
 .betting-hint {
   text-align: center;
   padding: 0.75rem;
@@ -677,7 +677,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Improved Button States */
+
 .approve-btn-modern:disabled,
 .bet-btn:disabled {
   opacity: 0.5;
@@ -708,7 +708,7 @@
   color: #fbbf24 !important;
 }
 
-/* Approve Button Disabled State */
+
 .approve-btn-modern:disabled {
   opacity: 0.6 !important;
   cursor: not-allowed !important;
@@ -716,7 +716,7 @@
   box-shadow: none !important;
 }
 
-/* Approval Loading State */
+
 .approval-loading {
   display: flex;
   align-items: center;
@@ -744,13 +744,13 @@
   to { transform: rotate(360deg); }
 }
 
-/* Approve Button When Disabled After Success */
+
 .approve-btn-modern:disabled {
   opacity: 0.7 !important;
   cursor: wait !important;
 }
 
-/* My Bet Badge */
+
 .my-bet-badge {
   display: inline-block;
   margin-left: 0.75rem;
@@ -768,7 +768,7 @@
   50% { opacity: 0.8; transform: scale(1.05); }
 }
 
-/* NFT Badge on Outcome Sides */
+
 .nft-badge {
   margin-top: 0.5rem;
   padding: 0.4rem 0.75rem;
@@ -780,7 +780,7 @@
   color: #f9a8d4;
 }
 
-/* NFT Holdings Section */
+
 .nft-holdings-section {
   padding: 1.5rem;
   background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
@@ -844,7 +844,7 @@
   color: #94a3b8;
 }
 
-/* NFT Info in Winner Section */
+
 .nft-info {
   display: flex;
   align-items: center;
@@ -862,7 +862,7 @@
   font-size: 1.5rem;
 }
 
-/* Cleaner NFT Indicator (replaces ugly nft-badge) */
+
 .user-nft-indicator {
   margin-top: 0.5rem;
   padding: 0.35rem 0.7rem;
@@ -881,7 +881,7 @@
   50% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.5); }
 }
 
-/* Success Box with Reset Button */
+
 .bet-success-box {
   display: flex;
   flex-direction: column;
@@ -916,7 +916,7 @@
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
-/* Better Spacing - Add margins between sections */
+
 .admin-section {
   margin-top: 1.5rem;
 }
@@ -929,7 +929,7 @@
   margin-top: 0;
 }
 
-/* Redesigned NFT Holdings Display */
+
 .nft-holdings-display {
   padding: 1.5rem;
   background: rgba(15, 20, 35, 0.6);
@@ -1005,7 +1005,7 @@
   letter-spacing: 0.5px;
 }
 
-/* Success Box Styling */
+
 .bet-success-box {
   display: flex;
   flex-direction: column;
@@ -1047,7 +1047,7 @@
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
-/* Better NFT Position Card with Icons */
+
 .nft-position-icon {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
@@ -1066,7 +1066,7 @@
   color: #cbd5e1 !important;
 }
 
-/* Add spacing between major sections */
+
 .action-section {
   border-top: 1px solid rgba(99, 102, 241, 0.2);
 }

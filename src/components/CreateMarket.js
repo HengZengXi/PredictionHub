@@ -8,7 +8,7 @@ function CreateMarket() {
   const [arbitrator, setArbitrator] = useState('');
   const [date, setDate] = useState('');
 
-  // FIX: Get TOMORROW's date as minimum
+  // Get tmrw's date as minimum
   const getMinDate = () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -94,7 +94,7 @@ function CreateMarket() {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
-              min={new Date().toISOString().split('T')[0]}
+              min={getMinDate()} 
             />
           </div>
           <div className="field-hint">

@@ -1,6 +1,6 @@
-/* Reputation Display Styles */
 
-/* Compact Badge for Navbar */
+
+
 .reputation-badge-compact {
   display: flex;
   align-items: center;
@@ -30,7 +30,7 @@
   font-family: 'Courier New', monospace;
 }
 
-/* Full Reputation Display */
+
 .reputation-display {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%);
   border: 2px solid;
@@ -71,7 +71,7 @@
   font-family: 'Courier New', monospace;
 }
 
-/* Progress Bar */
+
 .reputation-progress {
   margin-bottom: 1.5rem;
 }
@@ -100,7 +100,7 @@
   font-weight: 600;
 }
 
-/* Explainer Items */
+
 .reputation-explainer {
   display: flex;
   gap: 1rem;
@@ -129,7 +129,7 @@
   font-weight: 600;
 }
 
-/* Voting Power Calculator */
+
 .voting-power-card {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
   border: 2px solid rgba(99, 102, 241, 0.4);
@@ -558,9 +558,9 @@
   filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5)) !important;
 }
 
-/* Make ALL Reputation Sections 20% Smaller */
 
-/* Leaderboard - 20% Smaller */
+
+
 .leaderboard-section {
   padding: 1.6rem !important;
   max-width: 480px !important;
@@ -678,7 +678,7 @@
   padding: 0.4rem 0.8rem !important;
 }
 
-/* Reputation Levels Grid - 20% Smaller */
+
 .example-box > div[style*="grid"] > div {
   padding: 0.8rem !important;
 }

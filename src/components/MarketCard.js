@@ -14,13 +14,13 @@ function MarketCard({
 
   const betAmountParsed = betAmount ? parseUnits(betAmount, 6) : 0n;
 
-  // Manual reset function
+  // manual reset function
   const resetBettingForm = () => {
     setBetAmount('');
     setShowBetting(false);
   };
 
-  // --- Read Token Allowance  ---
+  
   const { data: allowanceData } = useContractRead({
     address: tokenAddress,
     abi: tokenABI,
@@ -33,7 +33,7 @@ function MarketCard({
   // Treat allowance as 0n if undefined
   const allowance = allowanceData ?? 0n;
 
-  // --- "Approve" Token Hook ---
+ 
   const { config: configApprove } = usePrepareContractWrite({
     address: tokenAddress,
     abi: tokenABI,
@@ -43,7 +43,7 @@ function MarketCard({
   });
   const { isLoading: isLoadingApprove, isSuccess: isSuccessApprove, write: writeApprove } = useContractWrite(configApprove);
 
-  // --- "Bet" Hooks ---
+ 
   const { config: configYes } = usePrepareContractWrite({
     address: contractAddress,
     abi: contractABI,
@@ -62,7 +62,7 @@ function MarketCard({
   });
   const { isLoading: isLoadingNo, isSuccess: isSuccessNo, write: writeNo } = useContractWrite(configNo);
 
-  // --- Resolution Hooks ---
+  
   const { config: configResolveYes } = usePrepareContractWrite({
     address: contractAddress,
     abi: contractABI,
@@ -79,7 +79,7 @@ function MarketCard({
   });
   const { isLoading: isLoadingResolveNo, isSuccess: isSuccessResolveNo, write: writeResolveNo } = useContractWrite(configResolveNo);
 
-  // --- NFT: Read User's Winning Token Balance ---
+ 
   const yesTokenId = id * 2n; 
   const noTokenId = (id * 2n) + 1n;
 
@@ -96,7 +96,7 @@ function MarketCard({
     watch: true,
   });
 
-  // --- Read YES and NO token balances (for "Your Bet" badge) ---
+  
   const { data: yesTokenBalance } = useContractRead({
     address: contractAddress,
     abi: contractABI,
@@ -115,7 +115,7 @@ function MarketCard({
     watch: true,
   });
 
-  // --- "withdraw" Hook ---
+  
   const { config: configWithdraw } = usePrepareContractWrite({
     address: contractAddress,
     abi: contractABI,
@@ -125,7 +125,7 @@ function MarketCard({
   });
   const { isLoading: isLoadingWithdraw, isSuccess: isSuccessWithdraw, write: writeWithdraw } = useContractWrite(configWithdraw);
 
-  // Auto-clear after successful bet - SAFE version
+ 
   useEffect(() => {
     if (isSuccessYes || isSuccessNo) {
       const timer = setTimeout(() => {
@@ -136,21 +136,25 @@ function MarketCard({
     }
   }, [isSuccessYes, isSuccessNo]);
 
-  // --- Calculate Probabilities (using pools, not weighted for now) ---
+  
   const calculateProbabilities = () => {
-    const totalPool = yesBets + noBets;
+    
+    
+    const totalPool = weightedYes + weightedNo;
 
     if (totalPool === 0n) {
-      return { yesProb: 0, noProb: 0 };
+      return { yesProb: 50, noProb: 50 }; // Default to 50/50 if no bets
     }
-    const yesProb = Number((yesBets * 100n) / totalPool);
+    
+    // Convert to Number() BEFORE dividing to prevent truncation
+    const yesProb = Math.round((Number(weightedYes) * 100) / Number(totalPool));
     const noProb = 100 - yesProb;
     
     return { yesProb, noProb };
   };
 
   const { yesProb, noProb } = calculateProbabilities();
-  const totalPool = formatUnits(yesBets + noBets, 6);
+  const totalPool = formatUnits(yesBets + noBets, 6); // Total pool still shows raw USDC
   const isArbitrator = userAddress && arbitrator && (userAddress.toLowerCase() === arbitrator.toLowerCase());
   const hasSufficientAllowance = allowance >= betAmountParsed;
   const showApproveButton = !hasSufficientAllowance && betAmountParsed > 0n;
@@ -169,6 +173,7 @@ function MarketCard({
       <div className="market-header">
         <div className="market-question">
           {question}
+          
         </div>
         <div className="market-date">
           <span className="date-icon">📅</span>
@@ -186,8 +191,9 @@ function MarketCard({
             </div>
           </div>
           <div className="outcome-label">YES</div>
-          <div className="outcome-prob">{yesProb}%</div>
+          <div className="outcome-prob">{yesProb}%</div> {/* <-- This will now show 52% */}
           <div className="outcome-pool">{formatUnits(yesBets, 6)} USDC</div>
+          
         </div>
 
         {/* Center VS */}
@@ -207,8 +213,9 @@ function MarketCard({
             </div>
           </div>
           <div className="outcome-label">NO</div>
-          <div className="outcome-prob">{noProb}%</div>
+          <div className="outcome-prob">{noProb}%</div> {/* <-- This will now show 48% */}
           <div className="outcome-pool">{formatUnits(noBets, 6)} USDC</div>
+          
         </div>
       </div>
 
@@ -304,7 +311,6 @@ function MarketCard({
                     </button>
                   </div>
                   
-                  {/* ----- THIS BLOCK WAS CHANGED ----- */}
                   <div className="betting-hint success-hint">
                     ✓ Approval successful. Place your bet.
                   </div>
@@ -373,7 +379,7 @@ function MarketCard({
             onClick={() => writeWithdraw?.()} 
             className="withdraw-btn"
           >
-            {isLoadingWithdraw ? '⏳ Redeeming...' : '💰 Redeem Winnings'}
+            {isLoadingWithdraw ? '⏳ Redeeming...' : '💰 Redeem NFTs for Winnings'}
           </button>
         </div>
       )}

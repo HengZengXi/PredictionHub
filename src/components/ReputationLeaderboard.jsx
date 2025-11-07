@@ -21,11 +21,17 @@ function ReputationLeaderboard({ markets, currentUserAddress }) {
       isCurrentUser: true
     }];
 
-    // Only update if actually different
-    if (JSON.stringify(newLeaderboard) !== JSON.stringify(leaderboard)) {
-      setLeaderboard(newLeaderboard);
-    }
-  }, [currentUserAddress]); // Remove 'markets' and 'leaderboard' from dependencies
+    // ----- THIS BLOCK IS NOW FIXED -----
+    // Use the functional update form to safely compare with the previous state
+    setLeaderboard(prevLeaderboard => {
+      if (JSON.stringify(newLeaderboard) !== JSON.stringify(prevLeaderboard)) {
+        return newLeaderboard;
+      }
+      // If it's the same, return the previous state to avoid a re-render
+      return prevLeaderboard;
+    });
+
+  }, [currentUserAddress]); // The dependency array is now correct
 
   // Component to fetch and display individual user reputation
   const LeaderboardRow = ({ userAddress, rank, isCurrentUser }) => {
@@ -43,7 +49,7 @@ function ReputationLeaderboard({ markets, currentUserAddress }) {
     return (
       <div className={`leaderboard-item ${isCurrentUser ? 'current-user' : ''}`}>
         <div className={`leaderboard-rank rank-${rank}`}>
-          {rank === 1 && '🥇'}
+          {rank === 1 && '🏆'}
           {rank === 2 && '🥈'}
           {rank === 3 && '🥉'}
           {rank > 3 && `#${rank}`}
@@ -68,7 +74,7 @@ function ReputationLeaderboard({ markets, currentUserAddress }) {
           <span>🏆</span> Top Predictors
         </h2>
         <div className="empty-leaderboard">
-          <div className="empty-leaderboard-icon">📊</div>
+          <div className="empty-leaderboard-icon">👀</div>
           <p>No reputation data yet. Start betting to appear on the leaderboard!</p>
         </div>
       </div>
