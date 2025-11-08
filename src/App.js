@@ -2,7 +2,6 @@ import './App.css';
 import MarketCard from './components/MarketCard';
 import CreateMarket from './components/CreateMarket';
 import ReputationDisplay from './components/ReputationDisplay';
-import ReputationLeaderboard from './components/ReputationLeaderboard';
 import HowReputationWorks from './components/HowReputationWorks';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { useContractRead, useContractReads } from 'wagmi';
@@ -250,10 +249,6 @@ function App() {
               <span className="nav-icon">✅</span>
               <span>Resolved</span>
             </a>
-            <a onClick={(e) => scrollToSection(e, 'leaderboard')} className="nav-link" href="#leaderboard">
-              <span className="nav-icon">🏆</span>
-              <span>Leaderboard</span>
-            </a>
           </div>
 
           {renderWalletButton()}
@@ -339,13 +334,6 @@ function App() {
         ) : (
           renderMarketList(closedMarkets, closedMarketsPage, setClosedMarketsPage)
         )}
-      </section>
-
-      <section id="leaderboard" className="reputation-section">
-        <ReputationLeaderboard 
-          markets={processedMarkets} 
-          currentUserAddress={address} 
-        />
       </section>
 
       <section id="how-it-works" className="reputation-tutorial-section">
